@@ -1,5 +1,6 @@
 package com.jpm.SalesMessages;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.Test;
@@ -15,6 +16,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jpm.SalesMessages.model.Message;
 import com.jpm.SalesMessages.model.Sale;
+import com.jpm.SalesMessages.model.SalesRecord;
+import com.jpm.SalesMessages.service.SalesService;
 
 /**
  * Unit test for Sales Messages App API.
@@ -27,6 +30,9 @@ public class ApplicationTest
 	@Autowired
 	private MockMvc mvc;
 	
+	@Autowired
+	private SalesService salesService;
+	
 	@Test
     public void testSalesMessage() throws Exception
     {
@@ -34,7 +40,7 @@ public class ApplicationTest
 		Sale sale = new Sale();
 		sale.setType("apple");
 		sale.setValue(new Long(10));
-		sale.setCount(10);
+		sale.setCount(5);
 		message.setSale(sale);
 		mvc.perform(MockMvcRequestBuilders.post("/Sales")
 				  .content(asJsonString(message))
@@ -53,4 +59,23 @@ public class ApplicationTest
 	    }
 	} 
 
+	@Test
+	public void testMessageRecorded() throws Exception
+    {
+		SalesRecord salesRecord = salesService.getListOfSalesRecords().get("APPLE");
+		assertThat(salesRecord)
+			.isNotNull();
+		assertThat(salesRecord.getTotalAmount())
+	     	.isEqualTo(50);
+		assertThat(salesRecord.getSalesCount())
+			.isEqualTo(5);
+		assertThat(salesRecord.getListOfSales().get(0).getValue())
+			.isEqualTo(10);
+		assertThat(salesRecord.getListOfSales().get(0).getCount())
+			.isEqualTo(5);
+		assertThat(salesRecord.getListOfSales().get(0).getType())
+			.isEqualToIgnoringCase("apple");
+    }
+    
+	
 }

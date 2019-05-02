@@ -138,5 +138,9 @@ public class SalesService {
 			}
 		}
 	}
-	
+
+	public Map<String, SalesRecord> getListOfSalesRecords() {
+		return listOfSalesRecords;
+	}
+
 }
